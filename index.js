@@ -1,5 +1,9 @@
 let arrayUsers = JSON.parse(localStorage.getItem('Users')) || []
 
+function saveToLocalStorage(arr, name) {
+    localStorage.setItem(name, JSON.stringify(arr))
+}
+
 function createDiv(text) {
     const div = document.createElement('div')
     div.className = text
@@ -86,6 +90,43 @@ function createFormRegister() {
     }
 }
 
+function createFormLogin() {
+    const form = document.createElement('form')
+
+    const pLogin = document.createElement('p')
+    const pPassword = document.createElement('p')
+
+    pLogin.classList.add('pForm')
+    pPassword.classList.add('pForm')
+
+    pLogin.textContent = 'Введите логин'
+    pPassword.textContent = 'Введите пароль'
+
+    const inputLogin = document.createElement('input')
+    const inputPassword = document.createElement('input')
+
+    inputLogin.classList.add('inputForm')
+    inputPassword.classList.add('inputForm')
+
+    inputLogin.type = 'text'
+    inputPassword.type = 'password'
+
+    const button = document.createElement('button')
+    button.textContent = 'Войти'
+
+    form.append(pLogin)
+    form.append(inputLogin)
+    form.append(pPassword)
+    form.append(inputPassword)
+    form.append(button)
+
+    return {
+        form,
+        inputLogin,
+        inputPassword
+    }
+}
+
 function createAppRegister() {
     const container = document.getElementById('container')
     container.innerHTML = ''
@@ -127,6 +168,38 @@ function createAppRegister() {
     container.append(btnLogin)
     btnLogin.addEventListener('click', () => {
         createAppLogin()
+    })
+}
+
+function createAppLogin() {
+    const container = document.getElementById('container')
+    container.innerHTML = ''
+
+    const loginDiv = createDiv('loginDiv')
+    container.append(loginDiv)
+
+    const loginForm = createFormLogin()
+    loginDiv.append(loginForm.form)
+
+    loginForm.form.addEventListener('submit', (e) => {
+        e.preventDefault()
+        const login = loginForm.inputLogin.value.trim()
+        const password = loginForm.inputPassword.value.trim()
+
+        const user = arrayUsers.find(user => user.login === login && user.password === password)
+        if (user) {
+            localStorage.setItem('CurrentUser', JSON.stringify(user))
+            createPageStatements()
+        } else {
+            alert('Неправельно введены данные')
+        }
+    })
+
+    const btnRegister = createButton('Зарегистрироваться')
+    container.append(btnRegister)
+
+    btnRegister.addEventListener('click', () => {
+        createAppRegister()
     })
 }
 
