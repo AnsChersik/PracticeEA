@@ -1,4 +1,5 @@
 let arrayUsers = JSON.parse(localStorage.getItem('Users')) || []
+let arrayRequests = JSON.parse(localStorage.getItem('Requests')) || []
 
 function saveToLocalStorage(arr, name) {
     localStorage.setItem(name, JSON.stringify(arr))
@@ -127,6 +128,43 @@ function createFormLogin() {
     }
 }
 
+function createFormStatement() {
+    const form = document.createElement('form')
+
+    const pCar = document.createElement('p')
+    const pDesc = document.createElement('p')
+
+    pCar.classList.add('pForm')
+    pDesc.classList.add('pForm')
+
+    pCar.textContent = 'Введите номер автомобиля'
+    pDesc.textContent = 'Описание нарушения'
+
+    const inputCarNumber = document.createElement('input')
+    const inputDescription = document.createElement('input')
+
+    inputCarNumber.classList.add('inputForm')
+    inputDescription.classList.add('inputForm')
+
+    inputCarNumber.type = 'text'
+    inputDescription.type = 'text'
+
+    const button = document.createElement('button')
+    button.textContent = 'Отправить заявление'
+
+    form.append(pCar)
+    form.append(inputCarNumber)
+    form.append(pDesc)
+    form.append(inputDescription)
+    form.append(button)
+
+    return {
+        form,
+        inputCarNumber,
+        inputDescription
+    }
+}
+
 function createAppRegister() {
     const container = document.getElementById('container')
     container.innerHTML = ''
@@ -202,5 +240,78 @@ function createAppLogin() {
         createAppRegister()
     })
 }
+
+function createPageStatements() {
+    const container = document.getElementById('container')
+    container.innerHTML = ''
+
+    const user = JSON.parse(localStorage.getItem('CurrentUser'))
+    if (!user) {
+        createAppLogin()
+        return
+    }
+
+    const title = document.createElement('h2')
+    title.textContent = `Заявления пользователя ${user.surname} ${user.name}`
+    container.append(title)
+
+    const requests = JSON.parse(localStorage.getItem('Requests')) || []
+    const userRequests = requests.filter(request => request.userLogin === user.login)
+
+    const table = document.createElement('table')
+    const headerRow = document.createElement('tr')
+    ['Госномер', 'Описание нарушения', 'Статус'].forEach(text => {
+        const th = document.createElement('th')
+        th.textContent = text
+        headerRow.append(th)
+    })
+
+    table.append(headerRow)
+
+    userRequests.forEach(req => {
+        const row = document.createElement('tr')
+
+        const cellCar = document.createElement('td')
+        const cellDesc = document.createElement('td')
+        const cellStatus = document.createElement('td')
+
+        cellCar.textContent = req.carNumber
+        cellDesc.textContent = req.description
+        cellStatus.textContent = req.status
+
+        row.append(cellCar)
+        row.append(cellDesc)
+        row.append(cellStatus)
+
+        table.append(row)
+    })
+
+    container.append(table)
+
+    const formReq = createFormStatement()
+    container.append(formReq.form)
+
+    formReq.form.addEventListener('submit', (e) => {
+        e.preventDefault()
+        const carNumber = formReq.inputCarNumber.value.trim()
+        const description = formReq.inputDescription.value.trim()
+
+        if (carNumber && description) {
+            const newReq = {
+                carNumber,
+                description,
+                status: 'новое',
+                userLogin: user.login
+            }
+            arrayRequests.push(newReq)
+            saveToLocalStorage(arrayRequests, 'Requests')
+            createPageStatements()
+        } else {
+            alert('Заполните все поля')
+        }
+    })
+
+}
+
 
 document.addEventListener('DOMContentLoaded', createAppRegister)
