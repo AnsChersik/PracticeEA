@@ -8,6 +8,7 @@ function saveToLocalStorage(arr, name) {
 function createDiv(text) {
     const div = document.createElement('div')
     div.className = text
+    div.classList.add('conteinerDiv')
     return div
 }
 
@@ -185,6 +186,12 @@ function createAppRegister() {
         const password = formReg.inputPassword.value.trim()
 
         if (name && surname && phone && email && login && password) {
+            const User = arrayUsers.find(user => user.login === login)
+            if (User) {
+                alert('Логин занят')
+                return
+            }
+
             const newUser = {
                 name: name,
                 surname: surname,
@@ -203,7 +210,7 @@ function createAppRegister() {
     })
 
     const btnLogin = createButton('Войти')
-    container.append(btnLogin)
+    registerDiv.append(btnLogin)
     btnLogin.addEventListener('click', () => {
         createAppLogin()
     })
@@ -234,7 +241,7 @@ function createAppLogin() {
     })
 
     const btnRegister = createButton('Зарегистрироваться')
-    container.append(btnRegister)
+    loginDiv.append(btnRegister)
 
     btnRegister.addEventListener('click', () => {
         createAppRegister()
@@ -245,6 +252,9 @@ function createPageStatements() {
     const container = document.getElementById('container')
     container.innerHTML = ''
 
+    const pageStatementsDiv = createDiv('pageStatementsDiv')
+    container.append(pageStatementsDiv)
+
     const user = JSON.parse(localStorage.getItem('CurrentUser'))
     if (!user) {
         createAppLogin()
@@ -253,14 +263,16 @@ function createPageStatements() {
 
     const title = document.createElement('h2')
     title.textContent = `Заявления пользователя ${user.surname} ${user.name}`
-    container.append(title)
+    pageStatementsDiv.append(title)
 
     const requests = JSON.parse(localStorage.getItem('Requests')) || []
     const userRequests = requests.filter(request => request.userLogin === user.login)
 
     const table = document.createElement('table')
     const headerRow = document.createElement('tr')
-    ['Госномер', 'Описание нарушения', 'Статус'].forEach(text => {
+    headerRow.classList.add('headerRow')
+    const headerTable = ['Госномер', 'Описание нарушения', 'Статус']
+    headerTable.forEach(text => {
         const th = document.createElement('th')
         th.textContent = text
         headerRow.append(th)
@@ -286,10 +298,10 @@ function createPageStatements() {
         table.append(row)
     })
 
-    container.append(table)
+    pageStatementsDiv.append(table)
 
     const formReq = createFormStatement()
-    container.append(formReq.form)
+    pageStatementsDiv.append(formReq.form)
 
     formReq.form.addEventListener('submit', (e) => {
         e.preventDefault()
@@ -309,6 +321,13 @@ function createPageStatements() {
         } else {
             alert('Заполните все поля')
         }
+    })
+
+    const btnExit = createButton('Выйти')
+    pageStatementsDiv.append(btnExit)
+    btnExit.addEventListener('click', () => {
+        localStorage.removeItem('CurrentUser')
+        createAppLogin()
     })
 
 }

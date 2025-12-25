@@ -1,0 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Libertinus+Serif:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap');
+
+body {
+    background-color: #eeeeee;
+}
+
+h2, p, button, input {
+    font-family: "Libertinus Serif", serif;
+    font-weight: 400;
+    font-style: normal;
+    color: black;
+    font-size: 18px;
+}
+
+.conteinerDiv,
+form {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+table {
+    border: 1px solid black;
+}
+
+td {
+    border-top: 1px solid black;
+}
+
+button {
+    margin-top: 15px;
+    padding: 7px;
+    background-color: #b9b9b9;
+    border: 2px solid #212121;
+    border-radius: 15px;
+}
+
+input {
+    background-color: #e1e1e1;
+    border: 2px solid #3e3e3e;
+    border-radius: 5px;
+}
+
+input:focus, button:hover {
+    background-color: #70a8a5;
+    border: 2px solid #16221e;
+}
+
+
+tr, .headerRow:hover {
+    color: #3b3b3b;
+}
+
+tr:hover {
+    color: #169a9a;
+}
