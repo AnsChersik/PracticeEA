@@ -5,21 +5,13 @@ import { createFormRegister } from "./modules/createFormRegister.js"
 import { createFormLogin } from "./modules/createFormLogin.js"
 import { createFormStatement } from "./modules/createFormStatement.js"
 
-let admins = [
-    {
-        name: "Админ", surname: "Админович", phone: 880005553535, email: "admin@yandex",
-        login: '1234', password: 1234, role: 'Администратор'
-    }
-]
+let admins = [{
+    name: "Админ", surname: "Админович", phone: 880005553535, email: "admin@yandex",
+    login: '1234', password: 1234, role: 'Администратор'
+}]
 
-saveToLocalStorage(admins, 'Users')
-
-let arrayUsers = JSON.parse(localStorage.getItem('Users')) && admins
+let arrayUsers = JSON.parse(localStorage.getItem('Users')) || admins
 let arrayRequests = JSON.parse(localStorage.getItem('Requests')) || []
-
-// console.log(arrayUsers);
-
-
 
 function createAppRegister() {
     const container = document.getElementById('container')
@@ -103,16 +95,6 @@ function createAppLogin() {
                 alert('Неправельно введены данные')
             }
         }
-
-        // const user = arrayUsers.find(user => user.login === login && user.password === password)
-        // if (user) {
-        //     localStorage.setItem('CurrentUser', JSON.stringify(user))
-        //     createPageStatements()
-        // } else {
-        //     alert('Неправельно введены данные')
-        // }
-
-
     })
 
     const btnRegister = createButton('Зарегистрироваться')
@@ -142,9 +124,6 @@ function createPageStatementsAdmin() {
     pageStatementsAdminDiv.append(title)
 
     const requests = JSON.parse(localStorage.getItem('Requests')) || []
-    console.log(requests);
-
-    // const userRequests = requests.filter(request => request.userLogin === user.login)
 
     const table = document.createElement('table')
     const headerRow = document.createElement('tr')
@@ -157,9 +136,9 @@ function createPageStatementsAdmin() {
     })
 
     table.append(headerRow)
+    const statusSelects = []
 
     requests.forEach(req => {
-        // userRequests.forEach(req => {
         const row = document.createElement('tr')
 
         const cellCar = document.createElement('td')
@@ -167,42 +146,28 @@ function createPageStatementsAdmin() {
         const cellStatus = document.createElement('td')
         const cellFio = document.createElement('td')
 
-        const select = document.createElement('select')
-        const option = document.createElement('option')
-        const option1 = document.createElement('option')
-        const option2 = document.createElement('option')
-        const option3 = document.createElement('option')
-
-        option1.textContent = 'Новое'
-        option2.textContent = 'На рассмотрение'
-        option3.textContent = 'Завершено'
-
-        select.append(option)
-        select.append(option1)
-        select.append(option2)
-        select.append(option3)
-
-        cellStatus.append(select)
-
-
         cellCar.textContent = req.carNumber
         cellDesc.textContent = req.description
-        
-        // cellStatus.textContent = req.status
-        option.textContent = req.status
-        option1.textContent = 'Новое'
-        option2.textContent = 'На рассмотрение'
-        option3.textContent = 'Завершено'
-
-        select.append(option)
-        select.append(option1)
-        select.append(option2)
-        select.append(option3)
-
-        cellStatus.append(select)
 
         cellFio.textContent = req.fio
 
+        const select = document.createElement('select')
+
+        const option1 = document.createElement('option')
+        option1.textContent = req.status
+        select.append(option1)
+
+        const optionText = ['Новое', 'На рассмотрение', 'Завершено']
+
+        optionText.forEach(status => {
+            const option = document.createElement('option')
+            option.textContent = status
+            select.append(option)
+        })
+
+        statusSelects.push({ select, request: req })
+
+        cellStatus.append(select)
         row.append(cellCar)
         row.append(cellDesc)
         row.append(cellStatus)
@@ -216,31 +181,14 @@ function createPageStatementsAdmin() {
     const buttonSave = createButton('Сохранить')
     pageStatementsAdminDiv.append(buttonSave)
 
-    
+    buttonSave.addEventListener('click', () => {
+        statusSelects.forEach(({ select, request }) => {
+            request.status = select.value;
+        })
+        saveToLocalStorage(requests, 'Requests');
+        alert('Статусы успешно сохранены!');
 
-    // const formReq = createFormStatement()
-    // pageStatementsAdminDiv.append(formReq.form)
-
-    // formReq.form.addEventListener('submit', (e) => {
-    //     e.preventDefault()
-    //     const carNumber = formReq.inputCarNumber.value.trim()
-    //     const description = formReq.inputDescription.value.trim()
-
-    //     if (carNumber && description) {
-    //         const newReq = {
-    //             carNumber,
-    //             description,
-    //             status: 'новое',
-    //             userLogin: user.login,
-    //             fio: user.surname + ' ' + user.name
-    //         }
-    //         arrayRequests.push(newReq)
-    //         saveToLocalStorage(arrayRequests, 'Requests')
-    //         createPageStatementsAdmin()
-    //     } else {
-    //         alert('Заполните все поля')
-    //     }
-    // })
+    })
 
     const btnExit = createButton('Выйти')
     pageStatementsAdminDiv.append(btnExit)
@@ -317,7 +265,7 @@ function createPageStatements() {
             const newReq = {
                 carNumber,
                 description,
-                status: 'новое',
+                status: 'Новое',
                 userLogin: user.login,
                 fio: user.surname + ' ' + user.name
             }
@@ -339,4 +287,4 @@ function createPageStatements() {
 }
 
 
-document.addEventListener('DOMContentLoaded', createAppRegister)
+document.addEventListener('DOMContentLoaded', createAppLogin)
